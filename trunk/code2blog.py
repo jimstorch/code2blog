@@ -89,8 +89,8 @@ def colorize(text, lang, format, tab_size, line_numbers=False):
 		stdout=subprocess.PIPE)
 	child.stdin.write(text)
 	child.stdin.close()
-	html = child.stdout.read()
-	return html
+	output = child.stdout.read()
+	return output
 
 	
 class MyApp(object):
@@ -101,8 +101,7 @@ class MyApp(object):
 		self.gladefile = "code2blog.glade"  
 		self.wTree = gtk.glade.XML(self.gladefile)
 		self.window = self.wTree.get_widget("main_window")
-		if (self.window):
-			self.window.connect("destroy", gtk.main_quit)	
+		self.window.connect("destroy", gtk.main_quit)	
 
 		# Map signals to methods
 		dic = { 
@@ -218,7 +217,8 @@ class MyApp(object):
 					filename +
 					"\nwith the contents of the OUTPUT window?\n\n"
 					"Think before you click." ) 
-				warning = gtk.MessageDialog(None, gtk.DIALOG_MODAL, 
+				warning = gtk.MessageDialog(self.window,
+					gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
 					gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, warning_message)
 				warning.add_button(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL)
 				warning.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
@@ -247,7 +247,21 @@ class MyApp(object):
 		self.output_buffer.set_text("")	
 		
 	def button_about_clicked(self, widget):
-		pass
+			text = (
+				"code2blog v.10\n"
+				"A pyGTK front-end to GNU/Source Highlight\n"
+				"Copyright (C) 2006 Jim Storch\n\n"
+				"This is free software licensed under the GPL.\n\n"
+				"Special thanks to Lorenzo Bettini who did all the\n"
+				"heavy lighting by writing GNU/Source Highlight\n"
+				"http://www.gnu.org/software/src-highlite"
+				)
+			about = gtk.MessageDialog(self.window,
+				gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
+				gtk.MESSAGE_INFO, gtk.BUTTONS_NONE, text)
+			about.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
+			about.run()
+			about.destroy()
 
 	def button_quit_clicked(self, widget):
 		gtk.main_quit()
